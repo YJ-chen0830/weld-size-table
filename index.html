@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>焊道尺寸與強度速查表 | Fillet Weld Size &amp; Strength Reference</title>
+<script src="https://yj-chen0830.github.io/jrh-core/jrh-core.js?v=3" defer></script>
+<style>
+  :root{--navy:#0b1f3a;--navy2:#13284a;--gold:#c9a14a;--gold2:#e0bf6e;--bg:#f5f3ee;--ink:#1c2530;--line:#d8d2c2;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Noto Sans TC","Segoe UI",sans-serif;background:var(--bg);color:var(--ink);}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#f5f3ee;padding:28px 32px;}
+  header h1{margin:0;font-size:22px;}
+  header span{color:var(--gold2);font-size:13px;display:block;margin-top:4px;}
+  main{max-width:1060px;margin:0 auto;padding:28px 20px 60px;}
+  .grid{display:grid;grid-template-columns:1fr;gap:24px;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px 24px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .card h2{font-size:14.5px;margin:0 0 18px;color:var(--navy);font-weight:700;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--gold);padding-bottom:10px;}
+  .note{font-size:11.5px;color:#666;margin-top:12px;line-height:1.75;background:#f9f7f2;border-radius:6px;padding:9px 12px;}
+  table{width:100%;border-collapse:collapse;margin-top:10px;border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  th{background:var(--navy);color:#f5f3ee;font-weight:600;font-size:12px;padding:9px 10px;text-align:left;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--line);}
+  tr:nth-child(even) td{background:#f9f7f3;}
+  .converter-stack{display:grid;gap:16px;}
+  .converter{border:1px solid var(--line);border-radius:10px;padding:16px;background:#fcfbf8;}
+  .converter h3{margin:0 0 10px;color:var(--navy);font-size:14px;}
+  .converter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;}
+  @media(max-width:700px){.converter-grid{grid-template-columns:1fr;}}
+  label{display:block;font-size:12px;color:#666;margin:0 0 4px;font-weight:500;}
+  input{width:100%;padding:8px 11px;border:1.5px solid var(--line);border-radius:7px;font-size:13.5px;background:#fff;}
+  input:focus{outline:none;border-color:var(--gold);}
+  .field-note{font-size:11px;color:#8a8377;margin-top:6px;}
+  @media print{
+    header,.no-print{display:none!important;}
+    body{background:#fff;margin:0;font-size:9pt;line-height:1.5;color:#111;}
+    main{padding:0;max-width:100%!important;}
+    .grid{grid-template-columns:1fr!important;gap:10pt!important;}
+    .card{box-shadow:none!important;border:1px solid #ccc!important;border-radius:4pt!important;padding:10pt 12pt!important;break-inside:avoid;}
+    .card h2{font-size:10.5pt!important;padding-bottom:6pt!important;margin-bottom:9pt!important;}
+    .note{font-size:7.5pt!important;padding:6pt 9pt!important;}
+    table{border:1px solid #bbb!important;border-radius:0!important;margin-top:6pt!important;}
+    th{font-size:8pt!important;padding:5pt 7pt!important;background:#0b1f3a!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    td{font-size:8.5pt!important;padding:5pt 7pt!important;}
+    tr:nth-child(even) td{background:#f5f5f5!important;}
+    .converter{border:1pt solid #ccc!important;background:#fff!important;}
+    label{font-size:8pt!important;}
+    input{font-size:8.5pt!important;padding:5pt 7pt!important;border:1px solid #bbb!important;}
+    .field-note{font-size:7pt!important;}
+    @page{margin:15mm 12mm;size:A4;}
+  }
+</style>
+</head>
+<body data-tool="wst">
+<header>
+  <a href="https://yj-chen0830.github.io/engineering-hub/" style="color:var(--gold2);font-size:12.5px;text-decoration:none;display:inline-block;margin-bottom:8px;">← 返回工程計算中心</a>
+  <h1>焊道尺寸與強度速查表</h1>
+  <span>常用填角銲腳長對照 · AISC 360 LRFD 設計強度速查</span>
+</header>
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2>填角銲設計強度速查表</h2>
+      <div id="weld-table"></div>
+      <div class="note">
+        本表以 AISC 360 LRFD 填角銲設計強度公式計算：有效喉厚 = 0.707 × w；設計強度 φRn/單位長度 = φ × 0.6 × FEXX × throat / 1000。此處固定採 φ = 0.75、FEXX = 482 MPa，對應常用 E70XX 銲材。
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>常用單位換算</h2>
+      <div class="converter-stack" id="converter-stack"></div>
+      <div class="note">
+        各組換算彼此獨立。於任一欄位輸入數值後，同組其餘欄位即時更新，顯示為 4 位有效數字。
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>參考說明</h2>
+      <div class="note" style="margin-top:0">
+        本頁為固定參數之參考表，非客製化設計計算器。FEXX = 482 MPa 對應 E70XX，若改用其他銲材等級如 E60XX = 414 MPa 或 E80XX = 551 MPa，設計強度需改以對應 FEXX 重算，本表不直接涵蓋。表列數值均為已乘上 φ 的設計強度，且以每單位焊道長度表示；實際接頭所需焊長，仍需先由接合總傳力決定，再回推需要的焊道長度，可搭配本中心其他工具如「螺栓群偏心接合分析」或「鋼構接合檢核」使用。
+      </div>
+    </section>
+  </div>
+</main>
+<script>
+const PHI = 0.75;
+const FEXX = 482;
+const FILLET_SIZES = [3, 4, 5, 6, 8, 10, 12, 14, 16, 20];
+
+const CONVERTER_GROUPS = [
+  {
+    key: "length",
+    title: "長度",
+    units: [
+      { key: "mm", label: "mm", toBase: function(v){ return v; }, fromBase: function(v){ return v; } },
+      { key: "cm", label: "cm", toBase: function(v){ return v * 10; }, fromBase: function(v){ return v / 10; } },
+      { key: "m", label: "m", toBase: function(v){ return v * 1000; }, fromBase: function(v){ return v / 1000; } },
+      { key: "in", label: "in", toBase: function(v){ return v * 25.4; }, fromBase: function(v){ return v / 25.4; } }
+    ]
+  },
+  {
+    key: "force",
+    title: "力 / 載重",
+    units: [
+      { key: "kn", label: "kN", toBase: function(v){ return v; }, fromBase: function(v){ return v; } },
+      { key: "kgf", label: "kgf", toBase: function(v){ return v * 0.00980665; }, fromBase: function(v){ return v / 0.00980665; } },
+      { key: "lbf", label: "lbf", toBase: function(v){ return v / 224.809; }, fromBase: function(v){ return v * 224.809; } }
+    ]
+  },
+  {
+    key: "weldStrength",
+    title: "焊道線強度",
+    units: [
+      { key: "knmm", label: "kN/mm", toBase: function(v){ return v; }, fromBase: function(v){ return v; } },
+      { key: "kncm", label: "kN/cm", toBase: function(v){ return v / 10; }, fromBase: function(v){ return v * 10; } },
+      { key: "knm", label: "kN/m", toBase: function(v){ return v / 1000; }, fromBase: function(v){ return v * 1000; } }
+    ]
+  }
+];
+
+function effectiveThroat(legSize){
+  return 0.707 * legSize;
+}
+
+function designStrengthPerMm(legSize){
+  return PHI * 0.6 * FEXX * effectiveThroat(legSize) / 1000;
+}
+
+function formatSig(value, sig){
+  if (!Number.isFinite(value)) return "";
+  if (value === 0) return "0";
+  return Number(value).toPrecision(sig).replace(/(\.\d*?[1-9])0+$/,"$1").replace(/\.0+$/,"");
+}
+
+function renderWeldTable(){
+  const rows = FILLET_SIZES.map(function(size){
+    const throat = effectiveThroat(size);
+    const strengthPerMm = designStrengthPerMm(size);
+    const strengthPerCm = strengthPerMm * 10;
+    return "<tr>" +
+      "<td>" + size.toFixed(0) + "</td>" +
+      "<td>" + throat.toFixed(3) + "</td>" +
+      "<td>" + strengthPerMm.toFixed(4) + "</td>" +
+      "<td>" + strengthPerCm.toFixed(3) + "</td>" +
+      "</tr>";
+  }).join("");
+
+  document.getElementById("weld-table").innerHTML =
+    "<table>" +
+    "<thead><tr><th>腳長 w (mm)</th><th>有效喉厚 (mm)</th><th>設計強度 φRn/單位長度 (kN/mm)</th><th>設計強度 (kN/cm)</th></tr></thead>" +
+    "<tbody>" + rows + "</tbody>" +
+    "</table>";
+}
+
+function createConverterGroup(group){
+  const wrapper = document.createElement("section");
+  wrapper.className = "converter";
+  wrapper.innerHTML = "<h3>" + group.title + "</h3>";
+
+  const grid = document.createElement("div");
+  grid.className = "converter-grid";
+
+  group.units.forEach(function(unit, index){
+    const field = document.createElement("div");
+    const inputId = group.key + "-" + unit.key;
+    field.innerHTML =
+      "<label for=\"" + inputId + "\">" + unit.label + "</label>" +
+      "<input id=\"" + inputId + "\" inputmode=\"decimal\" " + (index === 0 ? "value=\"1\"" : "") + ">";
+    grid.appendChild(field);
+  });
+
+  wrapper.appendChild(grid);
+
+  const foot = document.createElement("div");
+  foot.className = "field-note";
+  foot.textContent = "在任一欄輸入數值即可反算其餘單位。";
+  wrapper.appendChild(foot);
+
+  document.getElementById("converter-stack").appendChild(wrapper);
+
+  const inputs = group.units.map(function(unit){
+    return { unit: unit, el: document.getElementById(group.key + "-" + unit.key) };
+  });
+
+  function updateFrom(sourceUnit, rawValue){
+    const numeric = parseFloat(rawValue);
+    if (!Number.isFinite(numeric)) {
+      inputs.forEach(function(entry){
+        if (entry.unit.key !== sourceUnit.key) entry.el.value = "";
+      });
+      return;
+    }
+    const baseValue = sourceUnit.toBase(numeric);
+    inputs.forEach(function(entry){
+      if (entry.unit.key === sourceUnit.key) return;
+      entry.el.value = formatSig(entry.unit.fromBase(baseValue), 4);
+    });
+  }
+
+  inputs.forEach(function(entry){
+    entry.el.addEventListener("input", function(){
+      updateFrom(entry.unit, entry.el.value);
+    });
+  });
+
+  updateFrom(group.units[0], inputs[0].el.value);
+}
+
+renderWeldTable();
+CONVERTER_GROUPS.forEach(createConverterGroup);
+
+window.jrhDocMeta = {
+  doc: "焊道尺寸與強度速查表",
+  codes: [
+    "AISC 360 LRFD 填角銲設計強度：φRn = φ × 0.6 × FEXX × Awe",
+    "本表固定採 φ = 0.75、FEXX = 482 MPa（E70XX）"
+  ],
+  notes: [
+    "本工具為速查參考頁，供常用填角銲腳長與設計線強度快速查核。",
+    "有效喉厚以 0.707 × 腳長計算，設計強度已包含 φ 折減。",
+    "正式設計與送審文件仍應由專業人員依專案條件確認。"
+  ]
+};
+</script>
+</body>
+</html>
